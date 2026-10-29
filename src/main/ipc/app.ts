@@ -6,6 +6,7 @@ import { getServerStatus } from '../server';
 import { createChildLogger } from '../lib/logger';
 import { SaveSettingsInputSchema } from '../../shared/schemas/config.schema';
 import { AUTO_LANGUAGE, isSupportedLanguage } from '../../shared/constants/languages';
+import { isPathWithinRoot } from '../lib/path-guard';
 import os from 'os';
 import path from 'path';
 
@@ -120,7 +121,7 @@ export function setupAppHandlers(): void {
 
     // Security check: only allow paths under ~/.call_md
     const callMdRoot = path.join(os.homedir(), '.call_md');
-    if (!absolutePath.startsWith(callMdRoot)) {
+    if (!isPathWithinRoot(absolutePath, callMdRoot)) {
       logger.warn({ path: absolutePath }, 'Attempted to open folder outside .call_md');
       return;
     }
